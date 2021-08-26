@@ -51,8 +51,9 @@ function makeDiagram(selector) {
             .attr('height', SIZE/4)
             .attr('stroke', 'black')
             .on('click', function() {
-                world.markFloorDirty(floorNumber);
-                diagram.floors[floorNumber].attr('class', 'dirty floor');
+                const isDirty = world.markFloorDirty(floorNumber);
+                if (isDirty) world.markFloorWet(floorNumber)
+                diagram.floors[floorNumber].attr('class', isDirty ? 'wet floor': 'dirty floor');
             });
     }
     
@@ -70,20 +71,18 @@ function makeDiagram(selector) {
 
 function renderWorld(diagram) {
     for (let floorNumber = 0; floorNumber < diagram.world.floors.length; floorNumber++) {
-        diagram.floors[floorNumber].attr('class', diagram.world.floors[floorNumber].dirty? 'dirty floor' : 'clean floor');
+        diagram.floors[floorNumber].attr('class', diagram.world.floors[floorNumber].dirty? 'dirty floor' : diagram.world.floors[floorNumber].wet ? 'wet floor' : 'clean floor');
     }
     diagram.robot.style('transform', `translate(${diagram.xPosition(diagram.world.location)}px,${diagram.yPosition(diagram.world.location)}px)`);
-    console.log(diagram.world.location);
-    console.log(diagram.world.floors);
 }
 
-function renderAgentPercept(diagram, dirty) {
-    let perceptLabel = {false: "It's clean", true: "It's dirty"}[dirty];
+function renderAgentPercept(diagram, { dirty, wet }) {
+    let perceptLabel = dirty ? "It's dirty" : wet ? "It's wet" : "It's clean"
     diagram.perceptText.text(perceptLabel);
 }
 
 function renderAgentAction(diagram, action) {
-    let actionLabel = {null:'Waiting','DIAG_UP': 'Going Diagonally','DIAG_DOWN': 'Going Diagonally', 'SUCK': 'Vacuuming', 'LEFT': 'Going left', 'RIGHT': 'Going right', 'DOWN': 'Going down', 'UP': 'Going up'}[action];
+    let actionLabel = {null:'Waiting', 'SUCK': 'Vacuuming', 'DRY': 'Drying' ,'LEFT': 'Going left', 'RIGHT': 'Going right', 'DOWN': 'Going down', 'UP': 'Going up'}[action.name];
     diagram.actionText.text(actionLabel)
 }
 
@@ -99,13 +98,10 @@ function makeAgentControlledDiagram() {
 
     function update() {
         let location = diagram.world.location;
-        console.log(location);
-        let percept = diagram.world.floors[location].dirty;
-        console.log(percept);
+        let percept = Object.assign({}, diagram.world.floors[location]);
+        console.log(percept)
         let action = reflexVacuumAgent(diagram.world);
-        console.log(action);
         diagram.world.simulate(action);
-        console.log(diagram.world.simulate(action));
         renderWorld(diagram);
         renderAgentPercept(diagram, percept);
         renderAgentAction(diagram, action);
