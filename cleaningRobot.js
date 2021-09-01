@@ -39,11 +39,17 @@ function reflexVacuumAgent(world) {
 	/* Always clear dirty actual location */
 	if (world.floors[world.location].dirty) { return { name: 'SUCK' } }
 	else if (world.floors[world.location].wet) { return { name: 'DRY' } }
-	else if (world.location == 0) { return {name: 'RIGHT', to: 1} }
-	else if (world.location == 1) { return {name: 'DOWN', to: 3} }
-	else if (world.location == 2) { return {name: 'UP', to: 0} }
-	else if (world.location == 3) { return {name: 'LEFT', to: 2} }
-	return { name: 'WAIT', to: 0 }
+
+	const actions = [
+		[ null, 'RIGHT', 'DOWN', 'DIAG_DOWN' ],
+		[ 'LEFT', null, 'DIAG_DOWN', 'DOWN' ],
+		[ 'UP', 'DIAG_UP', null, 'RIGHT' ],
+		[ 'DIAG_UP', 'UP', 'LEFT', null ]
+	];
+
+	const to = Math.floor(Math.random() * 4);
+	console.log(to)
+	return { name: actions[world.location][to], to: to }
 }
 
 // Rules are defined in data, in a table indexed by [location][dirty]

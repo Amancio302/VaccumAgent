@@ -82,7 +82,7 @@ function renderAgentPercept(diagram, { dirty, wet }) {
 }
 
 function renderAgentAction(diagram, action) {
-    let actionLabel = {null:'Waiting', 'SUCK': 'Vacuuming', 'DRY': 'Drying' ,'LEFT': 'Going left', 'RIGHT': 'Going right', 'DOWN': 'Going down', 'UP': 'Going up'}[action.name];
+    let actionLabel = {null:'Waiting', 'DIAG_UP': 'Going Diagonally','DIAG_DOWN': 'Going Diagonally', 'SUCK': 'Vacuuming', 'DRY': 'Drying' ,'LEFT': 'Going left', 'RIGHT': 'Going right', 'DOWN': 'Going down', 'UP': 'Going up'}[action.name];
     diagram.actionText.text(actionLabel)
 }
 
@@ -99,7 +99,6 @@ function makeAgentControlledDiagram() {
     function update() {
         let location = diagram.world.location;
         let percept = Object.assign({}, diagram.world.floors[location]);
-        console.log(percept)
         let action = reflexVacuumAgent(diagram.world);
         diagram.world.simulate(action);
         renderWorld(diagram);
