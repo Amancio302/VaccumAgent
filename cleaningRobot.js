@@ -48,7 +48,7 @@ function reflexVacuumAgent(world) {
 	];
 
 	const to = Math.floor(Math.random() * 4);
-	console.log(to)
+	
 	return { name: actions[world.location][to], to: to }
 }
 
